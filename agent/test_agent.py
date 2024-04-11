@@ -1,5 +1,5 @@
 from kafka import KafkaProducer, KafkaConsumer
-import json
+import json, time
 
 
 requests = [
@@ -46,6 +46,17 @@ requests = [
 if __name__ == "__main__":
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     for request in requests:
-        consumer = KafkaConsumer("logs", bootstrap_servers='localhost:9092')
+        consumer = KafkaConsumer("logs", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
+        request['timestamp'] = time.time()
         producer.send("agent", json.dumps(request).encode('utf-8'))
+        for msg in consumer:
+            try:
+                val = json.loads(msg.value)
+                if val['request'] == request:
+                    print(val)
+                    break
+            except json.JSONDecodeError:
+                pass
+            except KeyError:
+                pass
     producer.flush()
