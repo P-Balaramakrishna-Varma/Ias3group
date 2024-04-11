@@ -1,0 +1,17 @@
+{
+    "stage 1": [
+        {
+            "name": "vm_manager",
+            "path": "./",
+            "command": "python3 vm_manager.py"
+        },
+        {
+            "name": "node_manager",
+            "path": "./",
+            "command": "python3 node_manager.py"
+        }
+    ],
+    "stage 2": [
+
+    ]
+}
