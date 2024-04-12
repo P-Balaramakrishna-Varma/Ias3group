@@ -1,11 +1,54 @@
 from kafka import KafkaProducer, KafkaConsumer
-import json
+import json, paramiko
+
+
+class Node:
+    def __init__(self, node_id, ip, username, password):
+        self.node_id = node_id
+        self.ip = ip
+        self.username = username
+        self.password = password
+        self.is_active = False
+
+    def activate_node(self):
+        if(self.is_active == False):
+            # Connect to node with ssh
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname=self.ip, username=self.username, password=self.password)
+
+            # Type the command to run the initialization script
+            sftp_client = ssh_client.open_sftp()
+            sftp_client.put(SCRIPT_PATH, 'bootstrap.sh')
+            sftp_client.close()
+            
+            # Run the initialization script
+            ssh_client.exec_command('sh bootstrap.sh')
+
+            # Close the ssh connection
+            ssh_client.close()
+            self.is_active = True
+
+    def reset_node(self):
+        # Get all processes from agent
+        # Kill all processes
+        pass
+    
+    def get_health(self):
+        # Ask agent for health
+        pass
+    
+    def run_process(self, process_config):
+        # ask agent to run process implement now
+        pass
+
+
 
 
 ## Have a list of corresponding node ids and their agents
 class NodeManager:
     def __init__(self):
-        pass
+        self.nodes = {}
     
     def create_node(self):
         return {"method": "create_node"}
