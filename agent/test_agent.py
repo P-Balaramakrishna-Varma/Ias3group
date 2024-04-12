@@ -39,23 +39,28 @@ requests = [
 ]
 
 
-if __name__ == "__main__":
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    for request in requests:
+def kafka_rpc(topic, request):
         # Sending the request
         request['timestamp'] = time.time()
-        producer.send("AgentIn", json.dumps(request).encode('utf-8'))
+        producer.send(topic + 'In', json.dumps(request).encode('utf-8'))
+        producer.flush()
         
         # Wait for the response
-        consumer = KafkaConsumer("AgentOut", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
+        consumer = KafkaConsumer(topic + "Out", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
         for msg in consumer:
             try:
                 val = json.loads(msg.value)
                 if val['request'] == request:
-                    print(val)
-                    break
+                    return val
             except json.JSONDecodeError:
                 pass
             except KeyError:
                 pass
+
+
+if __name__ == "__main__":
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    for request in requests:
+       val = kafka_rpc("Agent", request)
+       print(val)
     producer.flush()

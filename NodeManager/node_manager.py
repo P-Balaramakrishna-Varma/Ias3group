@@ -2,6 +2,24 @@ from kafka import KafkaProducer, KafkaConsumer
 import json, paramiko
 
 
+def kafka_rpc(topic, request):
+        # Sending the request
+        request['timestamp'] = time.time()
+        producer.send(topic + 'In', json.dumps(request).encode('utf-8'))
+        producer.flush()
+        
+        # Wait for the response
+        consumer = KafkaConsumer(topic + "Out", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
+        for msg in consumer:
+            try:
+                val = json.loads(msg.value)
+                if val['request'] == request:
+                    return val
+            except json.JSONDecodeError:
+                pass
+            except KeyError:
+                pass
+
 class Node:
     def __init__(self, node_id, ip, username, password):
         self.node_id = node_id
@@ -39,9 +57,11 @@ class Node:
         pass
     
     def run_process(self, process_config):
-        # ask agent to run process implement now
-        pass
-
+        process_details = kafka_rpc("Agent", {"method": "start_process", "node_id": self.node_id, "args": process_config})
+        if(process_details['status'] == 'success'):
+            return True
+        else:
+            return False
 
 
 
@@ -51,8 +71,14 @@ class NodeManager:
         self.nodes = {}
     
     def create_node(self):
-        return {"method": "create_node"}
-        
+        Vm_details = kafka_rpc("VmManager", {"method": "allocate_vm"})
+        if(Vm_details['status'] == 'success'):
+            node = Node(len(self.nodes), Vm_details['ip'], Vm_details['username'], Vm_details['password'])
+            self.nodes[node.node_id] = node
+            return {'status': 'success', "msg": "created a node"}
+        else:
+            return {'status': 'failure', "error": "No VMs available"}
+            
     def remove_node(self, node_id):
         return {"method": "remove_node", "nodeid": node_id}
 
@@ -63,8 +89,14 @@ class NodeManager:
         return {"method": "get_health", "nodeid": node_id}
         
     def run_process_on_node(self, node_id, process_config):
-        return {"method": "run_process_on_node", "process_config": process_config, "nodeid": node_id}
-    
+        if(node_id not in self.nodes):
+            return {"status": 'failure', "error": "Node not found", "nodeid": node_id}
+        
+        sucess = self.nodes[node_id].run_process(process_config)
+        if(sucess):
+            return {'status': 'success', "msg": "Process started", "nodeid": node_id, "process_config": process_config}
+        else:
+            return {'status': 'failure', "error": "Process failed to start", "nodeid": node_id, "process_config": process_config}
     
     
 if __name__ == "__main__":
