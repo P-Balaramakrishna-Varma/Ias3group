@@ -58,3 +58,4 @@ if __name__ == "__main__":
         # Send the response
         response = {"request": request, "result": result}
         producer.send("VmManagerOut", json.dumps(response).encode('utf-8'))
+        producer.send("logs", json.dumps(response).encode('utf-8'))

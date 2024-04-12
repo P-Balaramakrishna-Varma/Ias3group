@@ -2,6 +2,7 @@ from kafka import KafkaProducer, KafkaConsumer
 import json, time
 import sys
 
+
 # maintain the list of all processes
 class Agent:
     def __init__(self):
@@ -41,7 +42,7 @@ if __name__ == "__main__":
         request = json.loads(msg.value)
         if(request['node_id'] == node_id):
             log = { 'Process': 'Agent ' + node_id, 'message': 'I have received a message', 'text': request}
-            # producer.send("logs", json.dumps(log).encode('utf-8'))
+            producer.send("logs", json.dumps(log).encode('utf-8'))
             
             # Process RPC request
             if(request['method'] == 'start_process'):
@@ -60,5 +61,5 @@ if __name__ == "__main__":
             
             # Send output
             response = {"request": request, "result": result}
-            # producer.send("logs", json.dumps(response).encode('utf-8'))
+            producer.send("logs", json.dumps(response).encode('utf-8'))
             producer.send('AgentOut', json.dumps(response).encode('utf-8'))

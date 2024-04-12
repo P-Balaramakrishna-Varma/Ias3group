@@ -1,8 +1,8 @@
-## start Vm
+## create Node
 ### request
 ```
 {
-    'method': 'allocate_vm',
+    'method': 'create_node',
     'timestamp': 'time.time()'
 }
 ```
@@ -12,22 +12,22 @@
     'request': 'entire request',
     'result': {
         'status': 'success',
-        'message': 'vm started successfully'
+        'message': 'node started successfully'
     }
     'result': {
         'status': 'failed',
-        'message': 'vm failed to start'
+        'message': 'node failed to start'
     }
 }
 ```
 
-## kill Vm
+## remove node
 ### request
 ```
 {
-    'method': 'remove_vm',
+    'method': 'remove_node',
     'args': {
-        'vm_id': vm_id
+        'node_id': 'node_id'
     },
     'timestamp': 'time.time()'
 }
@@ -38,22 +38,22 @@
     'request': 'entire request',
     'result': {
         'status': 'success',
-        'message': 'vm kill successfully'
+        'message': 'Node kill successfully'
     }
     'result': {
         'status': 'failed',
-        'message': 'vm failed to be killed'
+        'message': 'Node failed to be killed'
     }
 }
 ```
 
-## reset Vm
+## reset node
 ### request
 ```
 {
-    'method': 'reset_vm',
+    'method': 'reset_node',
     'args': {
-        'vm_id': vm_id
+        'node_id': node_id
     },
     'timestamp': 'time.time()'}
 ```
@@ -63,11 +63,11 @@
     'request': 'entire request',
     'result': {
         'status': 'success',
-        'message': 'vm reset successfully'
+        'message': 'node reset successfully'
     }
     'result': {
         'status': 'failed',
-        'message': 'vm failed to be reset'
+        'message': 'node failed to be reset'
     }
 }
 ```
@@ -95,12 +95,25 @@
 }
 ```
 
-## Get vms
+## run_process_on_node
 ### request
 ```
 {
-    'method': 'get_vms',
-    'timestamp': 'time.time()'}
+    'method': 'run_process_on_node',
+    'args': {
+        'node_id': 'node_id',
+        'config': {
+            'name': 'process_name',
+            'path': 'path_to_process',
+            'command': 'command_to_run',
+            'env': {
+                'env1': 'value1',
+                'env2': 'value2',
+            }
+        },
+    }
+    timestamp: 'time.time()'
+}
 ```
 ### response
 ```
@@ -108,10 +121,7 @@
     'request': 'entire request',
     'result': {
         'status': 'success',
-        'process': [],
-    }
-    'result': {
-        'status': 'failed',
+        'message': 'process started successfully'
     }
 }
 ```
