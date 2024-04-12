@@ -13,7 +13,6 @@ requests = [
                 'env' : {'key1': 'value1', 'key2': 'value2'}
                 }
             },
-        'response_topic': 'logs',
     },
     {
         'node_id': '0',
@@ -21,7 +20,6 @@ requests = [
         'args': {
             'process_id': '1'
             },
-        'response_topic': 'logs',
     },
     {
         'node_id': '0',
@@ -29,17 +27,14 @@ requests = [
         'args': {
             'process_id': '1'
             },
-        'response_topic': 'logs',
     },
     {
         'node_id': '0',
         'method': 'get_health',
-        'response_topic': 'logs',
     },
     {
         'node_id': '0',
         'method': 'get_processes',
-        'response_topic': 'logs',
     }
 ]
 
