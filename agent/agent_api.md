@@ -1,5 +1,3 @@
-Add time stamp to every request.   
-
 ## start process
 ### request
 ```
@@ -16,8 +14,7 @@ Add time stamp to every request.
                 'env2': 'value2',
             }
         },
-    'response_topic': 'topic_to_send_response'
-    }
+    'timestamp': 'time.time()'    }
 }
 ```
 ### response
@@ -44,8 +41,7 @@ Add time stamp to every request.
     'args': {
         'process_id': process_id
     },
-    'response_topic': 'topic_to_send_response'
-
+    'timestamp': 'time.time()'
 }
 ```
 ### response
@@ -72,8 +68,7 @@ Add time stamp to every request.
     'args': {
         'process_id': process_id
     },
-    'response_topic': 'topic_to_send_response'
-}
+    'timestamp': 'time.time()'}
 ```
 ### response
 ```
@@ -96,8 +91,7 @@ Add time stamp to every request.
 {
     'node_id': node_id,
     'method': 'get_health',
-    'response_topic': 'topic_to_send_response'
-
+    'timestamp': 'time.time()'
 }
 ```
 ### response
@@ -121,8 +115,7 @@ Add time stamp to every request.
 {
     'node_id': node_id,
     'method': 'get_processes',
-    'response_topic': 'topic_to_send_response'
-}
+    'timestamp': 'time.time()'}
 ```
 ### response
 ```

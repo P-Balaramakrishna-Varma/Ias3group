@@ -43,12 +43,16 @@ requests = [
     }
 ]
 
+
 if __name__ == "__main__":
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     for request in requests:
-        consumer = KafkaConsumer("logs", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
+        # Sending the request
         request['timestamp'] = time.time()
-        producer.send("agent", json.dumps(request).encode('utf-8'))
+        producer.send("AgentIn", json.dumps(request).encode('utf-8'))
+        
+        # Wait for the response
+        consumer = KafkaConsumer("AgentOut", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
         for msg in consumer:
             try:
                 val = json.loads(msg.value)

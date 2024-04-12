@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     # Start agent server
     agent = Agent()
-    consumer = KafkaConsumer('agent', bootstrap_servers='localhost:9092')
+    consumer = KafkaConsumer('AgentIn', bootstrap_servers='localhost:9092')
     print("Starting the agent server\n")
    
     for msg in consumer:
@@ -61,4 +61,4 @@ if __name__ == "__main__":
             # Send output
             response = {"request": request, "result": result}
             # producer.send("logs", json.dumps(response).encode('utf-8'))
-            producer.send(request['response_topic'], json.dumps(response).encode('utf-8'))
+            producer.send('AgentOut', json.dumps(response).encode('utf-8'))
