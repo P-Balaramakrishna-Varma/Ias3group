@@ -1,30 +1,46 @@
 import subprocess
 from kafka import KafkaProducer, KafkaConsumer
-import json
+import json, time
+import sys
 
-def run_process(process_config, kafka_producer):
-    #request = {"agent id": "to be implemented", "method": }
-    kafka_producer.send("agent", json.dumps(process_config).encode('utf-8'))
-    consumer = KafkaConsumer("bootstrapRead", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
-    print("Waiting for agent to run the process " + process_config["name"])
-    for msg in consumer:
-        value = json.loads(msg.value.decode('utf-8'))
-        if(value['request'] == process_config):
-            print("The process " + process_config["name"] + "has started\n")
-            break
-
-# Stage 1
-producer = KafkaProducer(bootstrap_servers='localhost:9092')
-# agent_process = subprocess.Popen(['python', 'agent.py'])
-for process_config in json.load(open('boot_config.json'))['stage 1']:
-    run_process(process_config, producer)
+BOOTSTRAP_SERVER = 'localhost:9092'
 
 
+def kafka_rpc(topic, request):
+        # Sending the request
+        request['timestamp'] = time.time()
+        producer = KafkaProducer(bootstrap_servers=BOOTSTRAP_SERVER)
+        producer.send(topic + 'In', json.dumps(request).encode('utf-8'))
+        producer.flush()
+        
+        # Wait for the response
+        consumer = KafkaConsumer(topic + "Out", bootstrap_servers=BOOTSTRAP_SERVER, auto_offset_reset='earliest')
+        for msg in consumer:
+            try:
+                val = json.loads(msg.value)
+                if val['request'] == request:
+                    return val['result']
+            except json.JSONDecodeError:
+                pass
+            except KeyError:
+                pass
 
 
+if __name__ == '__main__':
+    BOOTSTRAP_SERVER = sys.argv[-1]
+    # # Stage 1
+    # agent_process = subprocess.Popen(['python', 'agent.py', '0', '10.1.36.50'], cwd='../agent', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # time.sleep(1)
+    # for process_config in json.load(open('boot_config.json'))['stage 1']:
+    #     request = {'node_id': '0', 'method': 'start_process', 'args': {'config': process_config}}
+    #     response = kafka_rpc('Agent', request)
+    #     if response['status'] == 'success':
+    #         print(process_config["name"] + ' Process started successfully')
+    #     else:
+    #         print(process_config["name"] + ' Process failed to start')
+    # agent_process.kill()
 
-# agent_process.kill()
-## Stage 2
-# Create a node
-# For each subsystem configuration, run the corresponding process.
-# Configuration = Node : Id, path, command json with three keys.
+    ## Stage 2
+    # Create a node
+    # For each subsystem configuration, run the corresponding process.
+    # Configuration = Node : Id, path, command json with three keys.

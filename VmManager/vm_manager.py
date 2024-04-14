@@ -2,6 +2,9 @@ from kafka import KafkaProducer, KafkaConsumer
 import json
 
 
+BOOTSTRAP_SERVER = 'localhost:9092'
+
+
 # Maintain the list of all VMs
 class VmManager:
     def __init__(self):
@@ -24,6 +27,7 @@ class VmManager:
     
 
 if __name__ == "__main__":
+    BOOTSTRAP_SERVER = sys.argv[-1]
     # create a producer, log that vm_manager has started.
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     log = { 'Process': 'vm_manager', 'message': 'I have been run' }

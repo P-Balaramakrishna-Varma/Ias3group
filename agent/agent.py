@@ -3,13 +3,16 @@ import json, time
 import sys
 
 
+BOOTSTRAP_SERVER = 'localhost:9092'
+
+
 # maintain the list of all processes
 class Agent:
     def __init__(self):
         pass
     
     def start_process(self, process_config):
-        return {'method': 'start_process', 'process_config': process_config}
+        return {'method': 'start_process', 'process_config': process_config, 'status': 'success'}
 
     def kill_process(self, process_id):
         return {'method': 'kill_process', 'process_id': process_id}
@@ -27,15 +30,17 @@ class Agent:
 if __name__ == "__main__":
     # get the node_id.
     node_id = sys.argv[1]
+    BOOTSTRAP_SERVER = sys.argv[-1]
     
     # create a producer, log that agent has started.
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer = KafkaProducer(bootstrap_servers=BOOTSTRAP_SERVER)
     log = { 'Process': 'Agent' + node_id, 'message': 'I have been run' }
     producer.send("logs", json.dumps(log).encode('utf-8'))
+    # producer.flush()
 
     # Start agent server
     agent = Agent()
-    consumer = KafkaConsumer('AgentIn', bootstrap_servers='localhost:9092')
+    consumer = KafkaConsumer('AgentIn', bootstrap_servers=BOOTSTRAP_SERVER)
     print("Starting the agent server\n")
    
     for msg in consumer:

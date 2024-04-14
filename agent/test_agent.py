@@ -35,19 +35,34 @@ requests = [
     {
         'node_id': '0',
         'method': 'get_processes',
+    },
+    {
+        "node_id": '0',
+        "method": "start_process",
+        "args": {
+            "config": {
+                "name": "process_name",
+                "path": "path_to_process",
+                "command": "command_to_run",
+                "env": {
+                    "env1": "value1",
+                    "env2": "value2"
+                }
+            }
+        }
     }
 ]
 
 
 if __name__ == "__main__":
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer = KafkaProducer(bootstrap_servers='10.1.36.50:9092')
     for request in requests:
         # Sending the request
         request['timestamp'] = time.time()
         producer.send("AgentIn", json.dumps(request).encode('utf-8'))
         
         # Wait for the response
-        consumer = KafkaConsumer("AgentOut", bootstrap_servers='localhost:9092', auto_offset_reset='earliest')
+        consumer = KafkaConsumer("AgentOut", bootstrap_servers='10.1.36.50:9092', auto_offset_reset='earliest')
         for msg in consumer:
             try:
                 val = json.loads(msg.value)
