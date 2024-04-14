@@ -133,6 +133,18 @@ if __name__ == "__main__":
     print(node_manager.nodes[1].is_active) 
     time.sleep(1)
     
+    health = node_manager.get_health(1)
+    print(health)
+    
+    run_out = node_manager.run_process_on_node(1, 
+            {
+                'name': 'install',
+                'path': '../agent',
+                'command': 'bash install.sh',
+            }
+    )
+    print(run_out)
+    
     output = node_manager.reset_node(1)
     print(output, "\n")
     
