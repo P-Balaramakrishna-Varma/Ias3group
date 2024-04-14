@@ -112,7 +112,7 @@ if __name__ == "__main__":
     # producer.flush()
 
     # Start agent server
-    agent = Agent()
+    agent = Agent(node_id)
     consumer = KafkaConsumer('AgentIn', bootstrap_servers=BOOTSTRAP_SERVER)
     print("Starting the agent server\n")
    

@@ -2,10 +2,10 @@
 
 # pswd="$1"
 
-echo "Starting installation on Linux..."
+# echo "Starting installation on Linux..."
 
-# Installing Docker
-echo "Installing Docker..."
+# # Installing Docker
+# echo "Installing Docker..."
 # sudo -S apt-get update
 # sudo -S apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
@@ -20,9 +20,9 @@ echo "Installing Docker..."
 # sudo usermod -aG docker $USER
 
 # Installing GNOME Terminal
-echo "Installing GNOME Terminal..."
-# sudo -S apt-get install -y gnome-terminal
+# echo "Installing GNOME Terminal..."
+# # sudo -S apt-get install -y gnome-terminal
 
-echo "Installation completed successfully!"
+# echo "Installation completed successfully!"
+sleep 60s
 touch testing.txt
-sleep(100)

@@ -3,39 +3,39 @@ import json, time
 
 
 requests = [
-    {
-        'node_id': '0',
-        'method': 'start_process',
-        'args': {
-            'config': {
-                'name': 'process1',
-                'path': '/home/sreejan/IAS/MLOps/vmManager/',
-                'command': 'python3 vm_manager.py',
-                }
-            },
-    },
-    {
-        'node_id': '0',
-        'method': 'kill_process',
-        'args': {
-            'process_id': 'e77fb035-52c1-41c6-baba-027ce9c422cd'
-        },
-    },
-    {
-        'node_id': '0',
-        'method': 'reset_process',
-        'args': {
-            'process_id': '1'
-            },
-    },
-    {
-        'node_id': '0',
-        'method': 'get_health',
-    },
-    {
-        'node_id': '0',
-        'method': 'get_processes',
-    },
+    # {
+    #     'node_id': '0',
+    #     'method': 'start_process',
+    #     'args': {
+    #         'config': {
+    #             'name': 'install',
+    #             'path': '/home/balaramakrishna/Documents/4.2/IAS/PreProject/agent',
+    #             'command': 'bash install.sh',
+    #             }
+    #         },
+    # },
+    # {
+    #     'node_id': '0',
+    #     'method': 'kill_process',
+    #     'args': {
+    #         'process_id': '628796b0-7c35-4d03-b504-75f72876a54e'
+    #     },
+    # },
+    # {
+    #     'node_id': '0',
+    #     'method': 'reset_process',
+    #     'args': {
+    #         'process_id': '628796b0-7c35-4d03-b504-75f72876a54e'
+    #         },
+    # },
+    # {
+    #     'node_id': '0',
+    #     'method': 'get_health',
+    # },
+    # {
+    #     'node_id': '0',
+    #     'method': 'get_processes',
+    # },
 ]
 
 
