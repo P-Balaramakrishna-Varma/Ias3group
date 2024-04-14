@@ -9,8 +9,8 @@ requests = [
         'args': {
             'config': {
                 'name': 'process1',
-                'command': 'python3 process1.py',
-                'env' : {'key1': 'value1', 'key2': 'value2'}
+                'path': '/home/sreejan/IAS/MLOps/vmManager/',
+                'command': 'python3 vm_manager.py',
                 }
             },
     },
@@ -18,8 +18,8 @@ requests = [
         'node_id': '0',
         'method': 'kill_process',
         'args': {
-            'process_id': '1'
-            },
+            'process_id': 'e77fb035-52c1-41c6-baba-027ce9c422cd'
+        },
     },
     {
         'node_id': '0',
@@ -36,21 +36,6 @@ requests = [
         'node_id': '0',
         'method': 'get_processes',
     },
-    {
-        "node_id": '0',
-        "method": "start_process",
-        "args": {
-            "config": {
-                "name": "process_name",
-                "path": "path_to_process",
-                "command": "command_to_run",
-                "env": {
-                    "env1": "value1",
-                    "env2": "value2"
-                }
-            }
-        }
-    }
 ]
 
 

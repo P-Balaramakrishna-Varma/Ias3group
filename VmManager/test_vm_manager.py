@@ -5,13 +5,6 @@ import json, time
 requests = [
     {
         'method': 'allocate_vm',
-        'args': {
-            'config': {
-                'name': 'process1',
-                'command': 'python3 process1.py',
-                'env' : {'key1': 'value1', 'key2': 'value2'}
-                }
-            },
     },
     {
         'method': 'remove_vm',
@@ -27,6 +20,9 @@ requests = [
     },
     {
         'method': 'get_health',
+        'args': {
+            'vm_id': '1'
+            },
     },
     {
         'method': 'get_vms',

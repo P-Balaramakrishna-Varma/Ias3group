@@ -77,6 +77,9 @@
 ```
 {
     'method': 'get_health',
+    'args': {
+        'vm_id': 'vm_id',
+    }
     'timestamp': 'time.time()'
 }
 ```
