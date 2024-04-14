@@ -91,11 +91,12 @@ class NodeManager:
         if(Vm_details['status'] == 'success'):
             node = Node(len(self.nodes) + 1, Vm_details['ip'], Vm_details['username'], Vm_details['password'], Vm_details['id'])
             self.nodes[node.node_id] = node
-            return {'status': 'success', "msg": "created a node"}
+            return {'status': 'success', "msg": "created a node", "node_id": node.node_id}
         else:
             return {'status': 'failure', "error": "No VMs available"}
             
     def remove_node(self, node_id):
+        node_id = int(node_id)
         vm_remove_result = self.nodes[node_id].deactivate_node()
         if(vm_remove_result['status'] == 'success'):
             del self.nodes[node_id]
@@ -104,12 +105,15 @@ class NodeManager:
             return {'status': 'failure', "error": "Node not removed"}
     
     def reset_node(self, node_id):
+        node_id = int(node_id)
         return self.nodes[node_id].reset_node()
     
     def get_health(self, node_id):   ## ask agent of the corresponding nodes 
+        node_id = int(node_id)
         return self.nodes[node_id].get_health()
         
     def run_process_on_node(self, node_id, process_config):
+        node_id = int(node_id)
         if(node_id not in self.nodes):
             return {"status": 'failure', "error": "Node not found", "nodeid": node_id}
         
@@ -123,69 +127,92 @@ class NodeManager:
     
 if __name__ == "__main__":
     BOOTSTRAP_SERVER = sys.argv[-1]
-    print(BOOTSTRAP_SERVER)
-    
+    # create a producer, log that node_manager has started.
+    producer = KafkaProducer(bootstrap_servers=BOOTSTRAP_SERVER)
+    log = { 'Process': 'node_manager', 'message': 'I have been run' }
+    producer.send("logs", json.dumps(log).encode('utf-8'))
+
+    # Start node_manager server
     node_manager = NodeManager()
-    node_manager.create_node()
-    print(node_manager.nodes)
-    print(node_manager.nodes[1].is_active)
-    node_manager.nodes[1].activate_node()
-    print(node_manager.nodes[1].is_active) 
-    time.sleep(1)
-    
-    health = node_manager.get_health(1)
-    print(health)
-    
-    run_out = node_manager.run_process_on_node(1, 
-            {
-                'name': 'install',
-                'path': '../agent',
-                'command': 'bash install.sh',
-            }
-    )
-    print(run_out)
-    
-    output = node_manager.reset_node(1)
-    print(output, "\n")
-    
-    output = node_manager.remove_node(1)
-    print(output)
-   
-    
-    
-    
+    consumer = KafkaConsumer('NodeManagerIn', bootstrap_servers=BOOTSTRAP_SERVER)
+    print("Starting Node Manager Server")
+
+    for msg in consumer:
+        # Take input
+        request = json.loads(msg.value.decode('utf-8'))
+        log = { 'Process': 'node_manager', 'message': 'I have received a message', 'text': request}
+        producer.send("logs", json.dumps(log).encode('utf-8'))
+        
+        # Process RPC request
+        if(request['method'] == 'create_node'):
+            result = node_manager.create_node()
+            if(result['status'] == 'success'):
+                node_manager.nodes[result['node_id']].activate_node()
+        elif(request['method'] == 'remove_node'):
+            result = node_manager.remove_node(request['args']['node_id'])
+        elif(request['method'] == 'reset_node'):
+            result = node_manager.reset_node(request['args']['node_id'])
+        elif(request['method'] == 'get_health'):
+            result = node_manager.get_health(request['args']['node_id'])
+        elif(request['method'] == 'run_process_on_node'):
+            result = node_manager.run_process_on_node(request['args']['node_id'], request['args']['config'])
+        else:
+            result = {"error": "method not found"}
+        
+        # Send output
+        response = {"request": request, "result": result}
+        producer.send("logs", json.dumps(response).encode('utf-8'))
+        producer.send("NodeManagerOut", json.dumps(response).encode('utf-8'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Test cases    
 # if __name__ == "__main__":
-#     # create a producer, log that node_manager has started.
-#     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-#     log = { 'Process': 'node_manager', 'message': 'I have been run' }
-#     producer.send("logs", json.dumps(log).encode('utf-8'))
-
-#     # Start node_manager server
+#     BOOTSTRAP_SERVER = sys.argv[-1]
+#     print(BOOTSTRAP_SERVER)
+    
 #     node_manager = NodeManager()
-#     consumer = KafkaConsumer('NodeManagerIn', bootstrap_servers='localhost:9092')
-#     print("Starting Node Manager Server")
-
-#     for msg in consumer:
-#         # Take input
-#         request = json.loads(msg.value.decode('utf-8'))
-#         log = { 'Process': 'node_manager', 'message': 'I have received a message', 'text': request}
-#         producer.send("logs", json.dumps(log).encode('utf-8'))
-        
-#         # Process RPC request
-#         if(request['method'] == 'create_node'):
-#             result = node_manager.create_node()
-#         elif(request['method'] == 'remove_node'):
-#             result = node_manager.remove_node(request['args']['node_id'])
-#         elif(request['method'] == 'reset_node'):
-#             result = node_manager.reset_node(request['args']['node_id'])
-#         elif(request['method'] == 'get_health'):
-#             result = node_manager.get_health(request['args']['node_id'])
-#         elif(request['method'] == 'run_process_on_node'):
-#             result = node_manager.run_process_on_node(request['args']['node_id'], request['args']['config'])
-#         else:
-#             result = {"error": "method not found"}
-        
-#         # Send output
-#         response = {"request": request, "result": result}
-#         producer.send("logs", json.dumps(response).encode('utf-8'))
-#         producer.send("NodeManagerOut", json.dumps(response).encode('utf-8'))
+#     node_manager.create_node()
+#     print(node_manager.nodes)
+#     print(node_manager.nodes[1].is_active)
+#     node_manager.nodes[1].activate_node()
+#     print(node_manager.nodes[1].is_active) 
+#     time.sleep(1)
+    
+#     health = node_manager.get_health(1)
+#     print(health)
+    
+#     run_out = node_manager.run_process_on_node(1, 
+#             {
+#                 'name': 'install',
+#                 'path': '../agent',
+#                 'command': 'bash install.sh',
+#             }
+#     )
+#     print(run_out)
+    
+#     output = node_manager.reset_node(1)
+#     print(output, "\n")
+    
+    # output = node_manager.remove_node(1)
+    # print(output)
+   
