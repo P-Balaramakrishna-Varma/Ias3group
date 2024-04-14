@@ -73,18 +73,18 @@ class Agent:
         name = process_config['name']
         command = process_config['command']
         path = process_config['path']
-        return {'method': 'start_process', 'process_id': self.processes.start_process(name, path,command)}
+        return {'method': 'start_process', 'process_id': self.processes.start_process(name, path,command), 'status': 'success'}
 
     def kill_process(self, process_id):
         self.processes.kill_process(process_id)
-        return {'method': 'kill_process', 'process_id': process_id}
+        return {'method': 'kill_process', 'process_id': process_id, 'status': 'success'}
 
     def reset_process(self, process_id):
         self.processes.reset_process(process_id)
-        return {'method': 'reset_process', 'process_id': process_id}
+        return {'method': 'reset_process', 'process_id': process_id, 'status': 'success'}
 
     def get_processes(self):
-        return {'method': 'get_processes', 'processes': self.processes.get_processes()}
+        return {'method': 'get_processes', 'processes': self.processes.get_processes(), 'status': 'success'}
 
     def get_health(self):
         # Improved health check using psutil
@@ -96,7 +96,8 @@ class Agent:
         return {
             'method': 'get_health',
             'free_cores': free_cores,
-            'free_memory_gb': free_memory_gb
+            'free_memory_gb': free_memory_gb,
+            'status': 'success'
         }
 
 
