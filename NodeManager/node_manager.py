@@ -26,12 +26,13 @@ def kafka_rpc(topic, request):
 
 
 class Node:
-    def __init__(self, node_id, ip, username, password):
+    def __init__(self, node_id, ip, username, password, vm_id):
         self.node_id = node_id
         self.ip = ip
         self.username = username
         self.password = password
         self.is_active = False
+        self.vm_id = vm_id
 
     def activate_node(self):
         if(self.is_active == False):
@@ -47,20 +48,24 @@ class Node:
             
             # Run the initialization script
             ssh_client.exec_command('bash bootstrap.sh ' + str(self.node_id) +  ' 10.1.36.50:9092')
+            time.sleep(1)
 
             # Close the ssh connection
             ssh_client.close()
             self.is_active = True
 
     def reset_node(self):
-        # vm_response_reset = kafka_rpc("VmManager", {"method": "reset_vm"}) ## properly written
-        # self.activate_node()
-        pass
+        vm_response_reset = kafka_rpc("VmManager", {"method": "reset_vm", "args": {"vm_id": self.vm_id}})
+        time.sleep(1)
+        self.is_active = False
+        self.activate_node()
+        return vm_response_reset
     
     def deactivate_node(self):
-        # vm_response_deactivate = kafka_rpc("VmManager", {"method": "deactivate_vm"}) ## properly written
-        # self.is_active = False
-        pass
+        vm_response_deactivate = kafka_rpc("VmManager", {'method': 'remove_vm', 'args': {'vm_id': self.vm_id}}) ## properly written
+        self.is_active = False
+        self.vm_id = None
+        return vm_response_deactivate
     
     def get_health(self):
         return kafka_rpc("Agent", {"method": "get_health", "node_id": str(self.node_id)})
@@ -81,17 +86,17 @@ class NodeManager:
         self.nodes = {}
     
     def create_node(self):
-        # Vm_details = kafka_rpc("VmManager", {"method": "allocate_vm"})
-        Vm_details = {'status': 'success', 'ip': '10.1.36.96', 'username': 'ias2', 'password': 'ias2'}
+        Vm_details = kafka_rpc("VmManager", {"method": "allocate_vm"})
+        print(Vm_details)
         if(Vm_details['status'] == 'success'):
-            node = Node(len(self.nodes) + 1, Vm_details['ip'], Vm_details['username'], Vm_details['password'])
+            node = Node(len(self.nodes) + 1, Vm_details['ip'], Vm_details['username'], Vm_details['password'], Vm_details['id'])
             self.nodes[node.node_id] = node
             return {'status': 'success', "msg": "created a node"}
         else:
             return {'status': 'failure', "error": "No VMs available"}
             
     def remove_node(self, node_id):
-        vm_remove_result = self.deactivate_node(node_id)
+        vm_remove_result = self.nodes[node_id].deactivate_node()
         if(vm_remove_result['status'] == 'success'):
             del self.nodes[node_id]
             return {'status': 'success', "msg": "Node removed"}
@@ -120,29 +125,20 @@ if __name__ == "__main__":
     BOOTSTRAP_SERVER = sys.argv[-1]
     print(BOOTSTRAP_SERVER)
     
-    node_manger = NodeManager()
-    node_manger.create_node()
-    print(node_manger.nodes)
-    print(node_manger.nodes[0].is_active)
-    node_manger.nodes[0].activate_node()
-    print(node_manger.nodes[0].is_active) 
-    time.sleep(2)
+    node_manager = NodeManager()
+    node_manager.create_node()
+    print(node_manager.nodes)
+    print(node_manager.nodes[1].is_active)
+    node_manager.nodes[1].activate_node()
+    print(node_manager.nodes[1].is_active) 
+    time.sleep(1)
     
-    output = node_manger.run_process_on_node(0,
-        {
-            'name': 'process_name',
-            'path': 'path_to_process',
-            'command': 'command_to_run',
-            'env': {
-                'env1': 'value1',
-                'env2': 'value2',
-            }
-        },
-    )
+    output = node_manager.reset_node(1)
     print(output, "\n")
     
-    output = node_manger.get_health(0)
-    print(output, "\n")
+    output = node_manager.remove_node(1)
+    print(output)
+   
     
     
     
