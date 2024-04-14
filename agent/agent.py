@@ -21,7 +21,7 @@ class Process:
 
     def start(self):
         cdCommand = "cd " + self.path
-        self.command = cdCommand + " && " + self.command
+        self.command = cdCommand + " && " + self.command + " " + BOOTSTRAP_SERVER
         self.process = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         return self.process_id
 

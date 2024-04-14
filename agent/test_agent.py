@@ -3,17 +3,17 @@ import json, time
 
 
 requests = [
-    # {
-    #     'node_id': '0',
-    #     'method': 'start_process',
-    #     'args': {
-    #         'config': {
-    #             'name': 'install',
-    #             'path': '/home/balaramakrishna/Documents/4.2/IAS/PreProject/agent',
-    #             'command': 'bash install.sh',
-    #             }
-    #         },
-    # },
+    {
+        'node_id': '0',
+        'method': 'start_process',
+        'args': {
+            'config': {
+                'name': 'install',
+                'path': '/home/balaramakrishna/Documents/4.2/IAS/PreProject/agent',
+                'command': 'bash install.sh',
+                }
+            },
+    },
     # {
     #     'node_id': '0',
     #     'method': 'kill_process',

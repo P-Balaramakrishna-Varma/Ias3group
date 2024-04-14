@@ -26,3 +26,4 @@
 # echo "Installation completed successfully!"
 sleep 60s
 touch testing.txt
+echo $1 > testing.txt
