@@ -6,27 +6,27 @@ requests = [
     {
         'method': 'allocate_vm',
     },
-    {
-        'method': 'remove_vm',
-        'args': {
-            'vm_id': '1'
-            },
-    },
+    # {
+    #     'method': 'remove_vm',
+    #     'args': {
+    #         'vm_id': '1'
+    #         },
+    # },
     {
         'method': 'reset_vm',
         'args': {
             'vm_id': '1'
             },
     },
-    {
-        'method': 'get_health',
-        'args': {
-            'vm_id': '1'
-            },
-    },
-    {
-        'method': 'get_vms',
-    }
+    # {
+    #     'method': 'get_health',
+    #     'args': {
+    #         'vm_id': '1'
+    #         },
+    # },
+    # {
+    #     'method': 'get_vms',
+    # }
 ]
 
 
